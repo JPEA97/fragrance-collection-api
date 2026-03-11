@@ -1,0 +1,40 @@
+Table users {
+  id integer [pk]
+  email varchar
+  username varchar
+  password_hash varchar
+}
+
+Table brands {
+  id integer [pk]
+  name varchar
+}
+
+Table fragrances {
+  id integer [pk]
+  brand_id integer
+  name varchar
+}
+
+Table tags {
+  id integer [pk]
+  type varchar
+  name varchar
+}
+
+Table fragrance_tags {
+  fragrance_id integer
+  tag_id integer
+}
+
+Table collection_items {
+  id integer [pk]
+  user_id integer
+  fragrance_id integer
+}
+
+Ref: fragrances.brand_id > brands.id
+Ref: fragrance_tags.fragrance_id > fragrances.id
+Ref: fragrance_tags.tag_id > tags.id
+Ref: collection_items.user_id > users.id
+Ref: collection_items.fragrance_id > fragrances.id
