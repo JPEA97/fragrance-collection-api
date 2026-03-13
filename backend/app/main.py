@@ -2,6 +2,7 @@
 
 from fastapi import FastAPI
 from app.core.config import settings
+from app.api.routes.users import router as users_router
 
 
 # Creating application object
@@ -17,3 +18,6 @@ app = FastAPI(
 @app.get("/")
 def health_check():
     return {"status": "API running"}
+
+
+app.include_router(users_router)
