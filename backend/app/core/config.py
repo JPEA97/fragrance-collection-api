@@ -11,7 +11,14 @@ class Settings(BaseSettings):
     debug: bool = True
     database_url: str = "postgresql://postgres:postgres@localhost:5432/fragrance_db"
 
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8")
+    secret_key: str = "change_me_in_real_projects"
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+    )
 
 
 # creating an instance of Settings class

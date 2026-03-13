@@ -1,8 +1,10 @@
 # Entry point of the API. It creates the FastAPI application object and defines the first route so the server can run
 
 from fastapi import FastAPI
-from app.core.config import settings
+
 from app.api.routes.users import router as users_router
+from app.api.routes.auth import router as auth_router
+from app.core.config import settings
 
 
 # Creating application object
@@ -21,3 +23,4 @@ def health_check():
 
 
 app.include_router(users_router)
+app.include_router(auth_router)
