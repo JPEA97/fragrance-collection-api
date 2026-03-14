@@ -7,6 +7,8 @@ from app.schemas.user import UserCreate, UserResponse
 
 from app.core.security import hash_password
 
+from app.api.deps.current_user import get_current_user
+
 router = APIRouter(prefix="/users", tags=["users"])
 
 
@@ -37,6 +39,12 @@ def create_user(payload: UserCreate, db: Session = Depends(get_db)):
     db.refresh(user)
 
     return user
+
+
+# Endpoint for getting current user
+@router.get("/me", response_model=UserResponse)
+def get_current_user_profile(current_user: User = Depends(get_current_user)):
+    return current_user
 
 
 # Endpoint for user retrieval
