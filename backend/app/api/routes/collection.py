@@ -4,9 +4,15 @@ from sqlalchemy.orm import Session
 
 from app.api.deps.current_user import get_current_user
 from app.db.deps import get_db
+from app.models.brand import Brand
 from app.models.collection_item import CollectionItem
+from app.models.fragrance import Fragrance
 from app.models.user import User
-from app.schemas.collection import CollectionItemCreate, CollectionItemResponse
+from app.schemas.collection import (
+    CollectionItemCreate,
+    CollectionItemDetailResponse,
+    CollectionItemResponse,
+)
 
 router = APIRouter(prefix="/collection", tags=["collection"])
 
@@ -40,3 +46,35 @@ def add_to_collection(
 
     db.refresh(item)
     return item
+
+
+@router.get("/", response_model=list[CollectionItemDetailResponse])
+def get_collection(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    rows = (
+        db.query(CollectionItem, Fragrance, Brand)
+        .join(Fragrance, CollectionItem.fragrance_id == Fragrance.id)
+        .join(Brand, Fragrance.brand_id == Brand.id)
+        .filter(CollectionItem.user_id == current_user.id)
+        .order_by(CollectionItem.created_at.desc())
+        .all()
+    )
+
+    return [
+        CollectionItemDetailResponse(
+            id=item.id,
+            ownership_type=item.ownership_type,
+            ml_remaining=item.ml_remaining,
+            personal_rating=item.personal_rating,
+            times_worn=item.times_worn,
+            created_at=item.created_at,
+            fragrance={
+                "id": fragrance.id,
+                "name": fragrance.name,
+                "brand": brand.name,
+            },
+        )
+        for item, fragrance, brand in rows
+    ]
