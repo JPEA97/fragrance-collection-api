@@ -13,6 +13,17 @@ class CollectionItemCreate(BaseModel):
     model_config = {"extra": "forbid"}
 
 
+class CollectionItemUpdate(BaseModel):
+    ownership_type: Optional[str] = Field(
+        default=None, pattern="^(full_bottle|decant|sample)$"
+    )
+    ml_remaining: Optional[float] = None
+    personal_rating: Optional[int] = Field(default=None, ge=1, le=10)
+    times_worn: Optional[int] = Field(default=None, ge=0)
+
+    model_config = {"extra": "forbid"}
+
+
 class CollectionFragranceResponse(BaseModel):
     id: int
     name: str

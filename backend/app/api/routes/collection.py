@@ -12,6 +12,7 @@ from app.schemas.collection import (
     CollectionItemCreate,
     CollectionItemDetailResponse,
     CollectionItemResponse,
+    CollectionItemUpdate,
 )
 
 router = APIRouter(prefix="/collection", tags=["collection"])
@@ -78,3 +79,68 @@ def get_collection(
         )
         for item, fragrance, brand in rows
     ]
+
+
+@router.patch("/{collection_item_id}", response_model=CollectionItemResponse)
+def update_collection_item(
+    collection_item_id: int,
+    payload: CollectionItemUpdate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    item = (
+        db.query(CollectionItem)
+        .filter(
+            CollectionItem.id == collection_item_id,
+            CollectionItem.user_id == current_user.id,
+        )
+        .first()
+    )
+
+    if not item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Collection item not found",
+        )
+
+    update_data = payload.model_dump(exclude_unset=True)
+
+    for field, value in update_data.items():
+        setattr(item, field, value)
+
+    try:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid collection item update",
+        )
+
+    db.refresh(item)
+    return item
+
+
+@router.delete("/{collection_item_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_collection_item(
+    collection_item_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    item = (
+        db.query(CollectionItem)
+        .filter(
+            CollectionItem.id == collection_item_id,
+            CollectionItem.user_id == current_user.id,
+        )
+        .first()
+    )
+
+    if not item:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Collection item not found",
+        )
+
+    db.delete(item)
+    db.commit()
