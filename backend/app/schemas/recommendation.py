@@ -15,6 +15,7 @@ class RecommendationFragranceResponse(BaseModel):
     id: int
     name: str
     brand: str
+    reason: str
 
 
 class RecommendationResponse(BaseModel):

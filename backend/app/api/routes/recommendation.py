@@ -51,6 +51,7 @@ def recommend_fragrance(
                 "id": entry["fragrance"].id,
                 "name": entry["fragrance"].name,
                 "brand": entry["brand"].name,
+                "reason": entry["reason"],
             }
             for entry in selected
         ]
