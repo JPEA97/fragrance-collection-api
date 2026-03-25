@@ -19,7 +19,7 @@ app = FastAPI(
 
 
 # Basic route so we can confirm the server is working
-@app.get("/")
+@app.get("/health")
 def health_check():
     return {"status": "API running"}
 

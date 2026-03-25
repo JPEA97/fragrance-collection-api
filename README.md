@@ -221,6 +221,7 @@ uvicorn app.main:app --reload
 The API will be available at:
 
 - App: `http://127.0.0.1:8000`
+- Health: `http://127.0.0.1:8000/health`
 - Swagger Docs: `http://127.0.0.1:8000/docs`
 
 ---
