@@ -105,6 +105,46 @@ def get_collection(
     ]
 
 
+@router.get("/{collection_item_id}", response_model=CollectionItemDetailResponse)
+def get_collection_item(
+    collection_item_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    row = (
+        db.query(CollectionItem, Fragrance, Brand)
+        .join(Fragrance, CollectionItem.fragrance_id == Fragrance.id)
+        .join(Brand, Fragrance.brand_id == Brand.id)
+        .filter(
+            CollectionItem.id == collection_item_id,
+            CollectionItem.user_id == current_user.id,
+        )
+        .first()
+    )
+
+    if not row:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Collection item not found",
+        )
+
+    item, fragrance, brand_row = row
+
+    return CollectionItemDetailResponse(
+        id=item.id,
+        ownership_type=item.ownership_type,
+        ml_remaining=item.ml_remaining,
+        personal_rating=item.personal_rating,
+        times_worn=item.times_worn,
+        created_at=item.created_at,
+        fragrance={
+            "id": fragrance.id,
+            "name": fragrance.name,
+            "brand": brand_row.name,
+        },
+    )
+
+
 @router.patch("/{collection_item_id}", response_model=CollectionItemResponse)
 def update_collection_item(
     collection_item_id: int,
