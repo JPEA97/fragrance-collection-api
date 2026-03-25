@@ -16,13 +16,12 @@ from app.schemas.collection import (
     CollectionItemResponse,
     CollectionItemUpdate,
 )
+from app.schemas.common import ItemEnvelope, ListEnvelope, MetaResponse
 
 router = APIRouter(prefix="/collection", tags=["collection"])
 
 
-@router.post(
-    "/", response_model=CollectionItemResponse, status_code=status.HTTP_201_CREATED
-)
+@router.post("/", response_model=ItemEnvelope, status_code=status.HTTP_201_CREATED)
 def add_to_collection(
     payload: CollectionItemCreate,
     db: Session = Depends(get_db),
@@ -48,10 +47,21 @@ def add_to_collection(
         )
 
     db.refresh(item)
-    return item
+
+    return ItemEnvelope(
+        data=CollectionItemResponse(
+            id=item.id,
+            fragrance_id=item.fragrance_id,
+            ownership_type=item.ownership_type,
+            ml_remaining=item.ml_remaining,
+            personal_rating=item.personal_rating,
+            times_worn=item.times_worn,
+            created_at=item.created_at,
+        )
+    )
 
 
-@router.get("/", response_model=list[CollectionItemDetailResponse])
+@router.get("/", response_model=ListEnvelope)
 def get_collection(
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
@@ -87,7 +97,7 @@ def get_collection(
         .all()
     )
 
-    return [
+    items = [
         CollectionItemDetailResponse(
             id=item.id,
             ownership_type=item.ownership_type,
@@ -104,8 +114,17 @@ def get_collection(
         for item, fragrance, brand_row in rows
     ]
 
+    return ListEnvelope(
+        data=items,
+        meta=MetaResponse(
+            limit=limit,
+            offset=offset,
+            count=len(items),
+        ),
+    )
 
-@router.get("/{collection_item_id}", response_model=CollectionItemDetailResponse)
+
+@router.get("/{collection_item_id}", response_model=ItemEnvelope)
 def get_collection_item(
     collection_item_id: int,
     db: Session = Depends(get_db),
@@ -130,22 +149,24 @@ def get_collection_item(
 
     item, fragrance, brand_row = row
 
-    return CollectionItemDetailResponse(
-        id=item.id,
-        ownership_type=item.ownership_type,
-        ml_remaining=item.ml_remaining,
-        personal_rating=item.personal_rating,
-        times_worn=item.times_worn,
-        created_at=item.created_at,
-        fragrance={
-            "id": fragrance.id,
-            "name": fragrance.name,
-            "brand": brand_row.name,
-        },
+    return ItemEnvelope(
+        data=CollectionItemDetailResponse(
+            id=item.id,
+            ownership_type=item.ownership_type,
+            ml_remaining=item.ml_remaining,
+            personal_rating=item.personal_rating,
+            times_worn=item.times_worn,
+            created_at=item.created_at,
+            fragrance={
+                "id": fragrance.id,
+                "name": fragrance.name,
+                "brand": brand_row.name,
+            },
+        )
     )
 
 
-@router.patch("/{collection_item_id}", response_model=CollectionItemResponse)
+@router.patch("/{collection_item_id}", response_model=ItemEnvelope)
 def update_collection_item(
     collection_item_id: int,
     payload: CollectionItemUpdate,
@@ -182,7 +203,18 @@ def update_collection_item(
         )
 
     db.refresh(item)
-    return item
+
+    return ItemEnvelope(
+        data=CollectionItemResponse(
+            id=item.id,
+            fragrance_id=item.fragrance_id,
+            ownership_type=item.ownership_type,
+            ml_remaining=item.ml_remaining,
+            personal_rating=item.personal_rating,
+            times_worn=item.times_worn,
+            created_at=item.created_at,
+        )
+    )
 
 
 @router.delete("/{collection_item_id}", status_code=status.HTTP_204_NO_CONTENT)

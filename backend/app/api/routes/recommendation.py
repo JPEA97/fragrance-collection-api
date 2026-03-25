@@ -9,13 +9,17 @@ from app.models.fragrance import Fragrance
 from app.models.fragrance_tag import FragranceTag
 from app.models.tag import Tag
 from app.models.user import User
-from app.schemas.recommendation import RecommendationRequest, RecommendationResponse
+from app.schemas.common import ListEnvelope, MetaResponse
+from app.schemas.recommendation import (
+    RecommendationFragranceResponse,
+    RecommendationRequest,
+)
 from app.services.recommendation import build_recommendations
 
 router = APIRouter(prefix="/recommendation", tags=["recommendation"])
 
 
-@router.post("/", response_model=RecommendationResponse)
+@router.post("/", response_model=ListEnvelope)
 def recommend_fragrance(
     payload: RecommendationRequest,
     db: Session = Depends(get_db),
@@ -45,14 +49,17 @@ def recommend_fragrance(
             detail="No recommendation candidates found",
         )
 
-    return RecommendationResponse(
-        fragrances=[
-            {
-                "id": entry["fragrance"].id,
-                "name": entry["fragrance"].name,
-                "brand": entry["brand"].name,
-                "reason": entry["reason"],
-            }
-            for entry in selected
-        ]
+    recommendations = [
+        RecommendationFragranceResponse(
+            id=entry["fragrance"].id,
+            name=entry["fragrance"].name,
+            brand=entry["brand"].name,
+            reason=entry["reason"],
+        )
+        for entry in selected
+    ]
+
+    return ListEnvelope(
+        data=recommendations,
+        meta=MetaResponse(count=len(recommendations)),
     )
