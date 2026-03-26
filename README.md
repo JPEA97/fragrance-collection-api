@@ -334,18 +334,34 @@ Each recommendation includes:
 
 ## Testing
 
-The project includes integration tests using `pytest` and FastAPI’s `TestClient`.
+The project includes both **integration tests** and **unit tests**.
 
-### Coverage
+### Integration Test Coverage
+
+Integration tests validate the behavior of the API end-to-end using `pytest` and FastAPI’s `TestClient`.
+
+Covered flows include:
 
 - Authentication flow
 - Unauthorized access handling
 - Collection ownership enforcement
 - Collection CRUD lifecycle
 - Filtering and pagination
-- Recommendation behavior and ranking logic
+- Recommendation endpoint behavior and ranking
 
-### Running tests
+### Unit Test Coverage
+
+Unit tests validate the recommendation scoring engine in isolation.
+
+Covered logic includes:
+
+- Top 3 result slicing
+- Stronger context matches ranking higher
+- Tie-breaking using lower `times_worn`
+- Reason generation
+- Empty input behavior
+
+### Running Tests
 
 From the `backend/` folder:
 
@@ -355,6 +371,7 @@ pytest
 
 ### Notes
 
-- Tests use a separate test database (SQLite)
+- Integration tests use a separate SQLite test database
 - The application’s database dependency is overridden during tests
 - Each test runs with a clean schema to ensure isolation
+- Recommendation service unit tests run without database or API setup
