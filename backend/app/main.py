@@ -1,3 +1,6 @@
+import logging
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, HTTPException
 from fastapi.exceptions import RequestValidationError
 
@@ -11,11 +14,29 @@ from app.core.error_handlers import (
     unexpected_exception_handler,
     validation_exception_handler,
 )
+from app.core.logging_config import configure_logging
+
+configure_logging()
+logger = logging.getLogger(__name__)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    logger.info(
+        "Starting application name=%s version=%s debug=%s",
+        settings.app_name,
+        settings.app_version,
+        settings.debug,
+    )
+    yield
+    logger.info("Shutting down application")
+
 
 app = FastAPI(
     title=settings.app_name,
     version=settings.app_version,
     debug=settings.debug,
+    lifespan=lifespan,
 )
 
 app.add_exception_handler(HTTPException, http_exception_handler)

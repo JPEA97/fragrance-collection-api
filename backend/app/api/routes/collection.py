@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -19,6 +20,7 @@ from app.schemas.collection import (
 from app.schemas.common import ItemEnvelope, ListEnvelope, MetaResponse
 
 router = APIRouter(prefix="/collection", tags=["collection"])
+logger = logging.getLogger(__name__)
 
 
 @router.post("/", response_model=ItemEnvelope, status_code=status.HTTP_201_CREATED)
@@ -47,6 +49,13 @@ def add_to_collection(
         )
 
     db.refresh(item)
+
+    logger.info(
+        "Collection item created user_id=%s collection_item_id=%s fragrance_id=%s",
+        current_user.id,
+        item.id,
+        item.fragrance_id,
+    )
 
     return ItemEnvelope(
         data=CollectionItemResponse(
@@ -204,6 +213,12 @@ def update_collection_item(
 
     db.refresh(item)
 
+    logger.info(
+        "Collection item updated user_id=%s collection_item_id=%s",
+        current_user.id,
+        item.id,
+    )
+
     return ItemEnvelope(
         data=CollectionItemResponse(
             id=item.id,
@@ -237,6 +252,12 @@ def delete_collection_item(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Collection item not found",
         )
+
+    logger.info(
+        "Collection item deleted user_id=%s collection_item_id=%s",
+        current_user.id,
+        item.id,
+    )
 
     db.delete(item)
     db.commit()

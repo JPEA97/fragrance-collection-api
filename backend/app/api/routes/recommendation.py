@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -17,6 +19,7 @@ from app.schemas.recommendation import (
 from app.services.recommendation import build_recommendations
 
 router = APIRouter(prefix="/recommendation", tags=["recommendation"])
+logger = logging.getLogger(__name__)
 
 
 @router.post("/", response_model=ListEnvelope)
@@ -48,6 +51,12 @@ def recommend_fragrance(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No recommendation candidates found",
         )
+
+    logger.info(
+        "Recommendation generated user_id=%s result_count=%s",
+        current_user.id,
+        len(selected),
+    )
 
     recommendations = [
         RecommendationFragranceResponse(
