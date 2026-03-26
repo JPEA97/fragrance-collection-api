@@ -1,130 +1,56 @@
+import json
+from pathlib import Path
+
 from sqlalchemy.orm import Session
 
 from app.db.session import SessionLocal
 from app.models.brand import Brand
 from app.models.fragrance import Fragrance
-from app.models.tag import Tag
 from app.models.fragrance_tag import FragranceTag
+from app.models.tag import Tag
+
+DATA_FILE = Path(__file__).parent / "data" / "catalog.json"
 
 
-CATALOG = {
-    "brands": [
-        {"name": "Dior"},
-        {"name": "Chanel"},
-        {"name": "Yves Saint Laurent"},
-    ],
-    "tags": [
-        {"type": "season", "name": "fall"},
-        {"type": "season", "name": "winter"},
-        {"type": "season", "name": "spring"},
-        {"type": "occasion", "name": "formal"},
-        {"type": "occasion", "name": "casual"},
-        {"type": "occasion", "name": "date"},
-        {"type": "time_of_day", "name": "day"},
-        {"type": "time_of_day", "name": "evening"},
-        {"type": "time_of_day", "name": "night"},
-        {"type": "weather", "name": "cold"},
-        {"type": "weather", "name": "mild"},
-        {"type": "location_type", "name": "indoor"},
-        {"type": "location_type", "name": "outdoor"},
-        {"type": "accord", "name": "woody"},
-        {"type": "accord", "name": "powdery"},
-        {"type": "accord", "name": "fresh"},
-        {"type": "note", "name": "iris"},
-        {"type": "note", "name": "vanilla"},
-        {"type": "note", "name": "bergamot"},
-    ],
-    "fragrances": [
-        {
-            "brand": "Dior",
-            "name": "Dior Homme Intense",
-            "release_year": 2011,
-            "gender_category": "masculine",
-            "description": "Elegant iris-forward fragrance for cooler weather.",
-            "tags": [
-                ("season", "fall"),
-                ("season", "winter"),
-                ("occasion", "formal"),
-                ("occasion", "date"),
-                ("time_of_day", "evening"),
-                ("time_of_day", "night"),
-                ("weather", "cold"),
-                ("location_type", "indoor"),
-                ("accord", "powdery"),
-                ("accord", "woody"),
-                ("note", "iris"),
-                ("note", "vanilla"),
-            ],
-        },
-        {
-            "brand": "Chanel",
-            "name": "Bleu de Chanel",
-            "release_year": 2010,
-            "gender_category": "masculine",
-            "description": "Versatile woody aromatic fragrance.",
-            "tags": [
-                ("season", "spring"),
-                ("season", "fall"),
-                ("occasion", "casual"),
-                ("occasion", "formal"),
-                ("time_of_day", "day"),
-                ("time_of_day", "evening"),
-                ("weather", "mild"),
-                ("location_type", "indoor"),
-                ("location_type", "outdoor"),
-                ("accord", "woody"),
-                ("accord", "fresh"),
-                ("note", "bergamot"),
-            ],
-        },
-        {
-            "brand": "Yves Saint Laurent",
-            "name": "La Nuit de L'Homme",
-            "release_year": 2009,
-            "gender_category": "masculine",
-            "description": "Smooth spicy fragrance for evenings and dates.",
-            "tags": [
-                ("season", "fall"),
-                ("season", "winter"),
-                ("occasion", "date"),
-                ("occasion", "casual"),
-                ("time_of_day", "evening"),
-                ("time_of_day", "night"),
-                ("weather", "cold"),
-                ("location_type", "indoor"),
-                ("accord", "woody"),
-                ("note", "bergamot"),
-            ],
-        },
-    ],
-}
+def load_catalog() -> dict:
+    with open(DATA_FILE, "r", encoding="utf-8") as file:
+        return json.load(file)
 
 
 def seed_catalog(db: Session) -> None:
-    brand_map = {}
-    tag_map = {}
+    catalog = load_catalog()
 
-    for brand_data in CATALOG["brands"]:
+    brand_map: dict[str, Brand] = {}
+    tag_map: dict[tuple[str, str], Tag] = {}
+
+    for brand_data in catalog["brands"]:
         brand = db.query(Brand).filter(Brand.name == brand_data["name"]).first()
+
         if not brand:
             brand = Brand(name=brand_data["name"])
             db.add(brand)
             db.flush()
+
         brand_map[brand.name] = brand
 
-    for tag_data in CATALOG["tags"]:
+    for tag_data in catalog["tags"]:
         tag = (
             db.query(Tag)
-            .filter(Tag.type == tag_data["type"], Tag.name == tag_data["name"])
+            .filter(
+                Tag.type == tag_data["type"],
+                Tag.name == tag_data["name"],
+            )
             .first()
         )
+
         if not tag:
             tag = Tag(type=tag_data["type"], name=tag_data["name"])
             db.add(tag)
             db.flush()
+
         tag_map[(tag.type, tag.name)] = tag
 
-    for fragrance_data in CATALOG["fragrances"]:
+    for fragrance_data in catalog["fragrances"]:
         brand = brand_map[fragrance_data["brand"]]
 
         fragrance = (
@@ -147,8 +73,8 @@ def seed_catalog(db: Session) -> None:
             db.add(fragrance)
             db.flush()
 
-        for tag_key in fragrance_data["tags"]:
-            tag = tag_map[tag_key]
+        for tag_type, tag_name in fragrance_data["tags"]:
+            tag = tag_map[(tag_type, tag_name)]
 
             existing_link = (
                 db.query(FragranceTag)

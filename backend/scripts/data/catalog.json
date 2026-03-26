@@ -1,0 +1,109 @@
+{
+  "brands": [
+    { "name": "Dior" },
+    { "name": "Chanel" },
+    { "name": "Yves Saint Laurent" }
+  ],
+  "tags": [
+    { "type": "season", "name": "spring" },
+    { "type": "season", "name": "summer" },
+    { "type": "season", "name": "fall" },
+    { "type": "season", "name": "winter" },
+
+    { "type": "occasion", "name": "casual" },
+    { "type": "occasion", "name": "office" },
+    { "type": "occasion", "name": "date" },
+    { "type": "occasion", "name": "wedding" },
+    { "type": "occasion", "name": "formal" },
+    { "type": "occasion", "name": "party" },
+
+    { "type": "time_of_day", "name": "early_morning" },
+    { "type": "time_of_day", "name": "day" },
+    { "type": "time_of_day", "name": "evening" },
+    { "type": "time_of_day", "name": "night" },
+
+    { "type": "weather", "name": "hot" },
+    { "type": "weather", "name": "mild" },
+    { "type": "weather", "name": "cold" },
+    { "type": "weather", "name": "rainy" },
+
+    { "type": "location_type", "name": "indoor" },
+    { "type": "location_type", "name": "outdoor" },
+
+    { "type": "accord", "name": "woody" },
+    { "type": "accord", "name": "fresh" },
+    { "type": "accord", "name": "powdery" },
+    { "type": "accord", "name": "spicy" },
+    { "type": "accord", "name": "amber" },
+
+    { "type": "note", "name": "iris" },
+    { "type": "note", "name": "bergamot" },
+    { "type": "note", "name": "vanilla" },
+    { "type": "note", "name": "cardamom" }
+  ],
+  "fragrances": [
+    {
+      "brand": "Dior",
+      "name": "Dior Homme Intense",
+      "release_year": 2011,
+      "gender_category": "masculine",
+      "description": "Elegant iris-forward fragrance for cooler weather.",
+      "tags": [
+        ["season", "fall"],
+        ["season", "winter"],
+        ["occasion", "formal"],
+        ["occasion", "date"],
+        ["time_of_day", "evening"],
+        ["time_of_day", "night"],
+        ["weather", "cold"],
+        ["location_type", "indoor"],
+        ["accord", "powdery"],
+        ["accord", "woody"],
+        ["note", "iris"],
+        ["note", "vanilla"]
+      ]
+    },
+    {
+      "brand": "Chanel",
+      "name": "Bleu de Chanel",
+      "release_year": 2010,
+      "gender_category": "masculine",
+      "description": "Versatile woody aromatic fragrance.",
+      "tags": [
+        ["season", "spring"],
+        ["season", "fall"],
+        ["occasion", "casual"],
+        ["occasion", "formal"],
+        ["time_of_day", "day"],
+        ["time_of_day", "evening"],
+        ["weather", "mild"],
+        ["location_type", "indoor"],
+        ["location_type", "outdoor"],
+        ["accord", "woody"],
+        ["accord", "fresh"],
+        ["note", "bergamot"]
+      ]
+    },
+    {
+      "brand": "Yves Saint Laurent",
+      "name": "La Nuit de L'Homme",
+      "release_year": 2009,
+      "gender_category": "masculine",
+      "description": "Smooth spicy fragrance for evenings and dates.",
+      "tags": [
+        ["season", "fall"],
+        ["season", "winter"],
+        ["occasion", "date"],
+        ["occasion", "casual"],
+        ["time_of_day", "evening"],
+        ["time_of_day", "night"],
+        ["weather", "cold"],
+        ["location_type", "indoor"],
+        ["accord", "spicy"],
+        ["accord", "woody"],
+        ["note", "cardamom"],
+        ["note", "bergamot"]
+      ]
+    }
+  ]
+}
