@@ -2,8 +2,10 @@ from collections.abc import Generator
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, event
 from sqlalchemy.orm import sessionmaker
+import sqlite3
+import unicodedata
 
 from app.db.base import Base
 from app.db.deps import get_db
@@ -15,6 +17,15 @@ from app.models.fragrance_tag import FragranceTag
 
 TEST_DATABASE_URL = "sqlite:///./test.db"
 
+
+def sqlite_unaccent(value: str | None) -> str | None:
+    if value is None:
+        return None
+
+    normalized = unicodedata.normalize("NFKD", value)
+    return "".join(char for char in normalized if not unicodedata.combining(char))
+
+
 engine = create_engine(
     TEST_DATABASE_URL,
     connect_args={"check_same_thread": False},
@@ -24,6 +35,12 @@ TestingSessionLocal = sessionmaker(
     autoflush=False,
     bind=engine,
 )
+
+
+@event.listens_for(engine, "connect")
+def register_sqlite_functions(dbapi_connection, connection_record):
+    if isinstance(dbapi_connection, sqlite3.Connection):
+        dbapi_connection.create_function("unaccent", 1, sqlite_unaccent)
 
 
 def override_get_db() -> Generator:
