@@ -53,7 +53,7 @@ const images: Record<string, string> = {
   'Parfums de Marly::Layton': '/images/layton.png',
   'Armaf::Odyssey Candee': '/images/odyssey-candee.png',
   'Dolce & Gabbana::Light Blue': '/images/light-blue-woman.png',
-  'Dolce & Gabbana::The One': '/images/the-one-woman.png',
+  'Dolce & Gabbana::The One for her': '/images/the-one-woman.png',
   'Pierre Cardin::Choc': '/images/choc.png',
   'Loewe::Aire': '/images/loewe-aire.png',
   'Le Labo::Santal 33': '/images/santal-33.png',

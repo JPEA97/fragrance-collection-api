@@ -9,6 +9,7 @@ import type {
 } from '../types/api'
 
 export interface CollectionParams {
+  [key: string]: string | number | boolean | null | undefined
   limit?: number
   offset?: number
   brand?: string

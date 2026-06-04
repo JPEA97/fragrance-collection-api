@@ -2,6 +2,7 @@ import { apiGet, apiGetList } from './client'
 import type { FragranceDetail, FragranceListItem, MetaResponse } from '../types/api'
 
 export interface FragranceParams {
+  [key: string]: string | number | boolean | null | undefined
   limit?: number
   offset?: number
   brand?: string
